@@ -1,0 +1,1053 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Aftelklok naar Bali</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="stylesheet" href="lettertypes.css">
+<style>
+/* Layout: één scherm, foto van Bali (per tijdstip in Bali) als achtergrond,
+   in het midden titel, emoji, een retro wekkerradio met LED-cijfers en een laadbalk. */
+:root {
+  --ink: #fffaf2;
+  --ink-soft: rgba(255, 250, 242, .78);
+  --led: #ff3b2f;
+  --led-glow: rgba(255, 59, 47, .55);
+  --led-off: rgba(255, 59, 47, .08);
+  --case: #1b1512;
+  --case-edge: #3a2c22;
+  --wood: #6b4226;
+  --bar-fill: #ffb547;
+  --bar-fill-2: #ff6a3d;
+  --bar-track: rgba(0, 0, 0, .45);
+  --shade: rgba(10, 6, 4, .38);
+  --font-display: "Bricolage Grotesque", "Avenir Next", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --duo-h: clamp(56px, 8vh, 72px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: #1a1410;
+  color: var(--ink);
+  font-family: var(--font-display);
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Achtergrond: foto (wanneer aanwezig) boven een kleurverloop dat bij het tijdstip past */
+.scene {
+  position: fixed; inset: 0; z-index: 0;
+  background: var(--sky, linear-gradient(180deg, #2b3a67, #f29e6d));
+  transition: background 2s ease;
+}
+.scene .photo {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0; transition: opacity 2s ease;
+}
+.scene .photo.on { opacity: 1; }
+.scene::after {
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(rgba(0,0,0,.12), rgba(0,0,0,.12)),
+    radial-gradient(ellipse at 50% 55%, transparent 0 25%, var(--shade) 80%),
+    linear-gradient(180deg, rgba(0,0,0,.25), transparent 30%, transparent 70%, rgba(0,0,0,.35));
+}
+
+.stage {
+  position: relative; z-index: 1;
+  min-height: 100%;
+  box-sizing: border-box;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: clamp(12px, 2.6vh, 28px);
+  padding-block: calc(max(10px, var(--safe-top)) + var(--duo-h)) max(20px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  text-align: center;
+}
+
+h1 {
+  margin: 0;
+  max-width: 18ch;
+  font-weight: 800;
+  font-size: clamp(26px, 7.6vw, 54px);
+  line-height: 1.08;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+  text-shadow: 0 2px 18px rgba(0,0,0,.45), 0 1px 2px rgba(0,0,0,.5);
+}
+h1 .heart { color: #ff4d6d; }
+.when {
+  margin: calc(-1 * clamp(4px, 1.4vh, 16px)) 0 0;
+  font-size: clamp(13px, 3.6vw, 17px);
+  font-weight: 500;
+  color: var(--ink);
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(10, 6, 4, .34);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  text-shadow: 0 1px 4px rgba(0,0,0,.6);
+}
+.giggle {
+  font-size: clamp(40px, 12vw, 72px);
+  line-height: 1;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.35));
+  animation: bob 3.2s ease-in-out infinite;
+}
+@keyframes bob { 0%,100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-6px) rotate(4deg); } }
+
+/* De wekkerradio */
+.radio {
+  width: min(100%, 560px);
+  box-sizing: border-box;
+  padding: clamp(10px, 2.6vw, 18px);
+  border-radius: clamp(18px, 4vw, 28px);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0) 40%),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 7px),
+    var(--wood);
+  box-shadow: 0 18px 50px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.25), inset 0 -3px 0 rgba(0,0,0,.35);
+}
+.face {
+  border-radius: clamp(10px, 2.4vw, 16px);
+  background: radial-gradient(ellipse at 50% 0%, #2a1e18, var(--case) 70%);
+  border: 2px solid var(--case-edge);
+  box-shadow: inset 0 6px 18px rgba(0,0,0,.8);
+  padding: clamp(12px, 3vw, 22px) clamp(8px, 2.4vw, 18px) clamp(8px, 2vw, 14px);
+}
+.digits {
+  display: flex; align-items: flex-start; justify-content: center;
+  gap: clamp(2px, .8vw, 6px);
+}
+.group { display: flex; flex-direction: column; align-items: center; gap: clamp(4px, 1vw, 8px); }
+.group .pair { display: flex; gap: clamp(2px, .7vw, 5px); }
+.digit { width: clamp(20px, 6.6vw, 44px); height: auto; aspect-ratio: 60 / 100; max-width: 100%; display: block; overflow: visible; }
+.digit polygon { fill: var(--led-off); transition: fill .08s linear; }
+.digit polygon.lit { fill: var(--led); filter: drop-shadow(0 0 3px var(--led-glow)); }
+.unit {
+  font-family: var(--font-mono);
+  font-size: clamp(9px, 2.4vw, 12px);
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #c9a27a;
+}
+.colon {
+  display: flex; flex-direction: column; justify-content: center;
+  gap: clamp(8px, 2.4vw, 16px);
+  height: calc(clamp(20px, 6.6vw, 44px) * 100 / 60);
+  padding-inline: clamp(1px, .5vw, 4px);
+}
+.colon i {
+  width: clamp(4px, 1.3vw, 8px); aspect-ratio: 1; border-radius: 50%;
+  background: var(--led); box-shadow: 0 0 6px var(--led-glow);
+  transition: opacity .15s;
+}
+.colon.blink i { opacity: .12; }
+.speaker {
+  margin-top: clamp(8px, 2vw, 14px);
+  height: clamp(8px, 2vw, 12px);
+  border-radius: 6px;
+  background: radial-gradient(circle, rgba(0,0,0,.55) 1.2px, transparent 1.6px) 0 0 / 7px 7px;
+  opacity: .8;
+}
+
+/* Laadbalk */
+.progress { width: min(100%, 560px); display: flex; flex-direction: column; gap: 8px; }
+.bar {
+  position: relative; height: clamp(16px, 4vw, 22px);
+  border-radius: 999px;
+  background: var(--bar-track);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.5), 0 1px 0 rgba(255,255,255,.15);
+  overflow: hidden;
+}
+.bar .fill {
+  position: absolute; inset: 0 auto 0 0; width: 0%;
+  border-radius: inherit;
+  background:
+    repeating-linear-gradient(-45deg, rgba(255,255,255,.18) 0 8px, transparent 8px 16px),
+    linear-gradient(90deg, var(--bar-fill-2), var(--bar-fill));
+  background-size: 22px 22px, 100% 100%;
+  animation: stripes 1.6s linear infinite;
+  box-shadow: 0 0 14px rgba(255,181,71,.5);
+}
+@keyframes stripes { to { background-position: 22px 0, 0 0; } }
+.bar .plane {
+  position: absolute; top: 50%; transform: translate(-60%, -52%);
+  font-size: clamp(14px, 3.6vw, 18px); line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,.6));
+}
+.legend {
+  display: flex; justify-content: space-between; gap: 12px;
+  font-family: var(--font-mono);
+  font-size: clamp(11px, 3vw, 13px);
+  font-weight: 500;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 3px rgba(0,0,0,.9), 0 0 10px rgba(0,0,0,.7);
+}
+.legend b { color: var(--ink); font-weight: 700; }
+
+.credit {
+  position: fixed; z-index: 1;
+  right: max(10px, env(safe-area-inset-right, 0px));
+  bottom: max(6px, env(safe-area-inset-bottom, 0px));
+  font-size: 10px; color: rgba(255,255,255,.7);
+  text-shadow: 0 1px 3px rgba(0,0,0,.7);
+}
+
+/* Twee klokjes bovenaan: Kris (links, België) en Novku (rechts, Makassar).
+   Ze staan onder de notch / het Dynamic Island en de stage houdt er plaats voor vrij. */
+.duo {
+  position: fixed; z-index: 2;
+  top: max(10px, var(--safe-top));
+  left: max(14px, env(safe-area-inset-left, 0px));
+  right: max(14px, env(safe-area-inset-right, 0px));
+  display: flex; justify-content: space-between; align-items: flex-start;
+  pointer-events: none;
+}
+.who { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.who .name {
+  font-size: clamp(13px, 3.6vw, 16px); font-weight: 700; line-height: 1;
+  color: var(--ink);
+  text-shadow: 0 1px 4px rgba(0,0,0,.7);
+}
+.who .time {
+  font-family: var(--font-mono); font-weight: 700;
+  font-size: clamp(14px, 4vw, 18px); line-height: 1;
+  font-variant-numeric: tabular-nums; letter-spacing: .04em;
+  color: var(--led); text-shadow: 0 0 6px var(--led-glow);
+  padding: 5px 8px; border-radius: 8px;
+  background: rgba(20, 14, 11, .78);
+  border: 1px solid var(--case-edge);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,.7), 0 2px 10px rgba(0,0,0,.35);
+}
+
+/* Liggend op een iPhone: klok naast titel */
+@media (orientation: landscape) and (max-height: 500px) {
+  :root { --duo-h: 44px; }
+  .stage { display: grid; grid-template-columns: 1fr 1.3fr; grid-template-rows: auto auto auto auto; column-gap: 24px; row-gap: 8px; align-content: center; justify-items: center; }
+  h1 { grid-column: 1; grid-row: 1; font-size: clamp(20px, 3.6vw, 34px); }
+  .when { grid-column: 1; grid-row: 2; margin: 0; }
+  .giggle { grid-column: 1; grid-row: 3; font-size: 40px; }
+  .bigslot { grid-column: 1; grid-row: 3; }
+  .radio { grid-column: 2; grid-row: 1 / span 3; }
+  .progress { grid-column: 2; grid-row: 4; }
+  .digit { width: clamp(18px, 3.6vw, 40px); }
+  .colon { height: calc(clamp(18px, 3.6vw, 40px) * 100 / 60); }
+}
+
+/* Halfweg (49,99 % tot 52 %): knop die het fragment afspeelt. Safari speelt geluid pas na een tik. */
+.halfway {
+  font: inherit; font-weight: 700; font-size: clamp(15px, 4.2vw, 19px);
+  color: #2a1608; cursor: pointer;
+  padding: 10px 20px; border: 0; border-radius: 999px;
+  background: linear-gradient(90deg, var(--bar-fill), #ffd77a);
+  box-shadow: 0 6px 22px rgba(255,181,71,.55), inset 0 1px 0 rgba(255,255,255,.6);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.halfway[hidden] { display: none; }
+.halfway.playing { animation: none; background: rgba(20,14,11,.82); color: var(--ink); box-shadow: 0 4px 14px rgba(0,0,0,.4); }
+@keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@media (orientation: landscape) and (max-height: 500px) { .halfway { grid-column: 1; grid-row: 4; } }
+
+/* Halfweg-foto: vanaf 49,99 % faadt de foto van Kris en Novku geleidelijk in over de
+   achtergrond terwijl het fragment speelt, en blijft daarna het hele scherm vullen.
+   pointer-events:none zodat een tik (om op iPhone het geluid te starten) doorgaat. */
+.halfphoto {
+  position: fixed; inset: 0; z-index: 5;
+  background: url("halfweg-foto.png") center / cover no-repeat;
+  opacity: 0; pointer-events: none; will-change: opacity;
+}
+
+/* Flikkerfoto's (sinds v25): nadat het grote aftellen klaar is en het getal op zijn plek
+   staat, flikkert om de 10 tot 45 seconden (willekeurig) een foto over het hele scherm in,
+   zoals een haperende TL-lamp, blijft ±1,5 s goed zichtbaar en faadt dan uit.
+   Ligt boven alles (ook boven het getal); pointer-events:none zodat tikken doorgaat. */
+.flash {
+  position: fixed; inset: 0; z-index: 9;
+  background: #000 center / cover no-repeat;
+  opacity: 0; pointer-events: none; will-change: opacity;
+}
+.flash.out { transition: opacity var(--flash-out, 1s) ease; }
+
+/* Tekentje onderaan: "tik voor geluid". Zichtbaar zodra de halfweg-foto start
+   (op iPhone begint het geluid pas na één tik) en verdwijnt zodra het geluid speelt.
+   pointer-events:none zodat een tik erop doorgaat en het geluid start. */
+.taphint {
+  position: fixed; z-index: 6;
+  left: 50%; transform: translateX(-50%);
+  bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 10px);
+  display: none; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(14px, 4vw, 18px); color: var(--ink);
+  padding: 10px 18px; border-radius: 999px; white-space: nowrap;
+  background: rgba(20, 14, 11, .82);
+  border: 1px solid var(--case-edge);
+  box-shadow: 0 6px 22px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.15);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  text-shadow: 0 1px 3px rgba(0,0,0,.7);
+  pointer-events: none;
+  animation: tappulse 1.8s ease-in-out infinite;
+}
+.taphint.show { display: flex; }
+@keyframes tappulse { 0%,100% { transform: translateX(-50%) scale(1); } 50% { transform: translateX(-50%) scale(1.05); } }
+
+/* Minder dan 100 dagen: een grote 100 telt per seconde af tot het echte aantal dagen,
+   schuift daarna kleiner naar de plek van 🤭 en blijft daar staan met slingers en glitters.
+   Het getal is een vaste laag (boven de halfweg-foto); #bigSlot houdt in de pagina plaats vrij. */
+.bigslot { width: 100%; height: var(--big-slot-h, 120px); flex: none; }
+.bigslot[hidden] { display: none; }
+.bigdim {
+  position: fixed; inset: 0; z-index: 7; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 50%, rgba(10,6,4,.35), rgba(10,6,4,.7));
+  opacity: 0; transition: opacity .8s ease;
+}
+.bigdim.on { opacity: 1; }
+.bigcount {
+  position: fixed; z-index: 8; pointer-events: none;
+  left: 50%; top: 50%; transform: translate(-50%, -50%);
+  font-family: var(--font-display); font-weight: 800; line-height: 1;
+  font-size: var(--big-fs, 200px);
+  font-variant-numeric: tabular-nums;
+  display: none;
+}
+.bigcount.show { display: block; }
+.bigcount.moving { transition: left 1.3s cubic-bezier(.6,0,.2,1), top 1.3s cubic-bezier(.6,0,.2,1), font-size 1.3s cubic-bezier(.6,0,.2,1); }
+.bigcount .num {
+  position: relative; z-index: 2; display: block; white-space: nowrap;
+  background: linear-gradient(180deg, var(--n1, #fff6d8) 0%, var(--n2, #ffd77a) 38%, var(--n3, #ffb547) 62%, var(--n4, #ff6a3d) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 .03em .02em rgba(0,0,0,.55)) drop-shadow(0 0 .12em var(--glow, rgba(255,181,71,.55)));
+}
+/* Vanaf 50 dagen: het getal pulseert, hoe minder dagen hoe sneller (--pulse wordt per dag gezet).
+   'scale' staat los van 'transform', zodat het samengaat met het 'pop'-effect tijdens het tellen. */
+.bigcount .num.hot { animation: bigpulse var(--pulse, 2s) ease-in-out infinite; }
+.bigcount .num.hot.pop { animation: bigpop .45s ease-out, bigpulse var(--pulse, 2s) ease-in-out infinite; }
+@keyframes bigpulse { 0%,100% { scale: 1; } 50% { scale: 1.12; } }
+.bigcount .num.pop { animation: bigpop .45s ease-out; }
+@keyframes bigpop { 0% { transform: scale(1.14); } 100% { transform: scale(1); } }
+/* Slingers en glitters: verborgen tijdens het tellen, zichtbaar rond het eindgetal */
+.bigcount .deco { position: absolute; pointer-events: none; opacity: 0; transition: opacity .8s ease .2s; }
+.bigcount.final .deco { opacity: 1; }
+.bigcount .garland { left: 50%; top: -.52em; width: 2.7em; height: .5em; transform: translateX(-50%); overflow: visible; }
+.bigcount .streamer { top: -.12em; width: .42em; height: 1.2em; overflow: visible; }
+.bigcount .streamer.l { left: -.62em; }
+.bigcount .streamer.r { right: -.62em; transform: scaleX(-1); }
+.bigcount .glitter { inset: 0; }
+.bigcount .spark {
+  position: absolute; width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  background: var(--c);
+  clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  filter: drop-shadow(0 0 3px var(--c));
+  animation: twinkle var(--d) ease-in-out var(--delay) infinite;
+}
+@keyframes twinkle { 0%,100% { transform: scale(.2) rotate(0deg); opacity: .2; } 50% { transform: scale(1) rotate(45deg); opacity: 1; } }
+
+/* Aanmoedigingen voor Nov (sinds v26): op 8 dec 2026 van 06:00 tot 12:00 Makassar-tijd
+   (visumcommissie om 10:30) licht op de plek van 🤭 telkens één banner op, blijft even staan,
+   faadt uit en maakt plaats voor de volgende. Van 10:15 tot 11:00 een extra grote banner die
+   blijft staan, met de gewone teksten klein en kort errond.
+   In die periode pauzeren het grote aftellen en de flikkerfoto's. */
+.cheer { display: none; flex: none; width: 100%; min-height: clamp(84px, 15vh, 140px); align-items: center; justify-content: center; }
+html.cheering .cheer { display: flex; }
+html.cheering .giggle, html.cheering .bigslot, html.cheering .bigcount, html.cheering .bigdim, html.cheering .flash { display: none !important; }
+.cheer .msg {
+  max-width: min(92vw, 560px); box-sizing: border-box;
+  font-family: var(--font-display); font-weight: 800; line-height: 1.12;
+  font-size: clamp(24px, 7.2vw, 44px); white-space: pre-line; text-wrap: balance;
+  color: #fff6d8; padding: .32em .85em; border-radius: 22px;
+  background: rgba(20, 14, 11, .72);
+  border: 2px solid #ffd77a;
+  box-shadow: 0 0 26px rgba(255, 215, 122, .55), inset 0 0 18px rgba(255, 215, 122, .18);
+  text-shadow: 0 0 12px rgba(255, 215, 122, .8), 0 2px 4px rgba(0,0,0,.6);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+  opacity: 0;
+}
+.cheer .msg.out, .msg.side.out { transition: opacity var(--cheer-out, .8s) ease; }
+/* Kleine banners die kort rond de grote oplichten (10:15 tot 11:00) */
+.msg.side {
+  position: fixed; z-index: 3; display: none; pointer-events: none;
+  max-width: 70vw; box-sizing: border-box; white-space: pre;
+  font-family: var(--font-display); font-weight: 800; line-height: 1.1;
+  font-size: clamp(14px, 4.2vw, 22px);
+  color: #fff6d8; padding: .35em .8em; border-radius: 999px;
+  background: rgba(20, 14, 11, .8); border: 1.5px solid #ffd77a;
+  box-shadow: 0 0 18px rgba(255, 215, 122, .55);
+  text-shadow: 0 0 10px rgba(255, 215, 122, .8), 0 1px 3px rgba(0,0,0,.6);
+  transform: rotate(var(--tilt, 0deg));
+  opacity: 0;
+}
+html.cheering .msg.side.show { display: block; }
+.cheer .msg.now {
+  font-size: clamp(24px, 7.6vw, 54px); padding: .3em .6em;
+  color: #2a1608; text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  background: linear-gradient(90deg, var(--bar-fill), #ffd77a, var(--bar-fill));
+  border-color: #fff6d8;
+  box-shadow: 0 0 40px rgba(255, 181, 71, .85), inset 0 1px 0 rgba(255,255,255,.6);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+@media (orientation: landscape) and (max-height: 500px) { .cheer { grid-column: 1; grid-row: 3; min-height: 0; } .cheer .msg { font-size: clamp(18px, 3.2vw, 28px); } .cheer .msg.now { font-size: clamp(18px, 3.4vw, 30px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .cheer .msg.now,
+  .giggle, .bar .fill, .halfway, .taphint, .bigcount .spark, .bigcount .num.pop, .bigcount .num.hot { animation: none; }
+  .bigcount.moving, .bigdim { transition: none; }
+  .scene, .scene .photo { transition: none; }
+}
+</style>
+
+<div class="scene" id="scene" aria-hidden="true">
+  <div class="photo" id="photoA"></div>
+  <div class="photo" id="photoB"></div>
+</div>
+
+<div class="halfphoto" id="halfPhoto" aria-hidden="true"></div>
+<div class="taphint" id="tapHint" aria-hidden="true"></div>
+<div class="bigdim" id="bigDim" aria-hidden="true"></div>
+<div class="bigcount" id="bigCount" aria-hidden="true"><span class="num" id="bigNum">100</span></div>
+<div class="flash" id="flash" aria-hidden="true"></div>
+
+<div class="duo" aria-label="Huidige tijd">
+  <div class="who left"><span class="name">Kris</span><time class="time" id="timeKris">--:--</time></div>
+  <div class="who right"><span class="name">Novku</span><time class="time" id="timeNovku">--:--</time></div>
+</div>
+
+<main class="stage">
+  <h1 id="title">Aftellen tot wanneer Mr. Amazing <span class="heart">❤</span> aankomt</h1>
+  <p class="when" id="when"></p>
+  <div class="giggle" aria-hidden="true">🤭</div>
+  <div class="bigslot" id="bigSlot" hidden aria-hidden="true"></div>
+  <div class="cheer" id="cheer" role="status" aria-live="polite"><div class="msg" id="cheerMsg"></div></div>
+  <div class="msg side" id="cheerSide" aria-hidden="true"></div>
+
+  <section class="radio" aria-label="Aftelklok">
+    <div class="face">
+      <div class="digits" id="digits" role="timer" aria-live="off"></div>
+      <div class="speaker" aria-hidden="true"></div>
+    </div>
+  </section>
+
+  <section class="progress" aria-label="Voortgang">
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" id="bar">
+      <div class="fill" id="fill"></div>
+      <div class="plane" id="plane" aria-hidden="true">✈️</div>
+    </div>
+    <div class="legend"><span id="legendStart"></span><b id="pct"></b><span id="legendEnd"></span></div>
+  </section>
+</main>
+<div class="credit" id="credit"></div>
+
+<script>
+(function () {
+  // Vaste momenten (Bali = WITA = UTC+8, geen zomeruur)
+  var ARRIVAL = Date.UTC(2027, 1, 28, 3, 15, 0);   // 28 feb 2027 11:15 in Denpasar
+  var START   = Date.UTC(2026, 6, 31, 16, 0, 0);   // 1 aug 2026 00:00 in Denpasar
+  var BALI_OFFSET_H = 8;
+
+  // Teksten per taal van de iPhone; Nederlands is de standaard
+  var T = {
+    nl: { title: 'Aftellen tot wanneer Mr. Amazing ♥ aankomt', units: ['dagen','uur','min','sec'], when: 'Landing in Denpasar: {d} (jouw tijd)', done: 'Mr. Amazing ♥ is er!', halfway: '🎉 Halfweg! Tik om af te spelen', stop: 'Tik om te stoppen' },
+    en: { title: 'Counting down until Mr. Amazing ♥ arrives', units: ['days','hrs','min','sec'], when: 'Landing in Denpasar: {d} (your time)', done: 'Mr. Amazing ♥ has arrived!', halfway: '🎉 Halfway there! Tap to play', stop: 'Tap to stop' },
+    fr: { title: 'Compte à rebours jusqu’à l’arrivée de Mr. Amazing ♥', units: ['jours','h','min','s'], when: 'Atterrissage à Denpasar : {d} (votre heure)', done: 'Mr. Amazing ♥ est arrivé !', halfway: '🎉 À mi-chemin ! Touchez pour écouter', stop: 'Touchez pour arrêter' },
+    de: { title: 'Countdown, bis Mr. Amazing ♥ ankommt', units: ['Tage','Std','Min','Sek'], when: 'Landung in Denpasar: {d} (deine Zeit)', done: 'Mr. Amazing ♥ ist da!', halfway: '🎉 Halbzeit! Tippen zum Abspielen', stop: 'Tippen zum Stoppen' },
+    es: { title: 'Cuenta atrás hasta que llegue Mr. Amazing ♥', units: ['días','h','min','s'], when: 'Aterrizaje en Denpasar: {d} (tu hora)', done: '¡Mr. Amazing ♥ ya está aquí!', halfway: '🎉 ¡A mitad de camino! Toca para reproducir', stop: 'Toca para parar' },
+    it: { title: 'Conto alla rovescia all’arrivo di Mr. Amazing ♥', units: ['giorni','ore','min','sec'], when: 'Atterraggio a Denpasar: {d} (ora locale)', done: 'Mr. Amazing ♥ è arrivato!', halfway: '🎉 A metà strada! Tocca per ascoltare', stop: 'Tocca per fermare' },
+    pt: { title: 'Contagem regressiva até a chegada de Mr. Amazing ♥', units: ['dias','h','min','s'], when: 'Aterragem em Denpasar: {d} (a sua hora)', done: 'Mr. Amazing ♥ chegou!', halfway: '🎉 A meio caminho! Toque para ouvir', stop: 'Toque para parar' },
+    id: { title: 'Menghitung mundur sampai Mr. Amazing ♥ tiba', units: ['hari','jam','mnt','dtk'], when: 'Mendarat di Denpasar: {d} (waktu Anda)', done: 'Mr. Amazing ♥ sudah tiba!', halfway: '🎉 Sudah setengah jalan! Ketuk untuk memutar', stop: 'Ketuk untuk berhenti' }
+  };
+  var locale = (navigator.languages && navigator.languages[0]) || navigator.language || 'nl-BE';
+  var lang = locale.toLowerCase().split('-')[0];
+  var L = T[lang] || T.nl;
+  if (!T[lang]) locale = 'nl-BE';
+  document.documentElement.lang = T[lang] ? lang : 'nl';
+
+  function setTitle(text) {
+    var h = document.getElementById('title');
+    var parts = text.split('♥');
+    h.textContent = '';
+    h.appendChild(document.createTextNode(parts[0]));
+    var heart = document.createElement('span'); heart.className = 'heart'; heart.textContent = '❤';
+    h.appendChild(heart);
+    h.appendChild(document.createTextNode(parts[1] || ''));
+  }
+  setTitle(L.title);
+  document.title = L.title.replace('♥', '❤');
+
+  // Aankomstmoment in de tijdzone en taal van het toestel
+  var whenFmt = new Intl.DateTimeFormat(locale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
+  document.getElementById('when').textContent = L.when.replace('{d}', whenFmt.format(new Date(ARRIVAL)));
+
+  var dateFmt = new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Asia/Makassar' });
+  document.getElementById('legendStart').textContent = dateFmt.format(new Date(START));
+  document.getElementById('legendEnd').textContent = dateFmt.format(new Date(ARRIVAL));
+  var pctFmt = new Intl.NumberFormat(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  // LED-cijfers met zeven segmenten
+  var SEG = {
+    a: [12, 8, 48, 8, 'h'], g: [12, 50, 48, 50, 'h'], d: [12, 92, 48, 92, 'h'],
+    f: [8, 12, 8, 48, 'v'], b: [52, 12, 52, 48, 'v'], e: [8, 52, 8, 88, 'v'], c: [52, 52, 52, 88, 'v']
+  };
+  var MAP = ['abcdef','bc','abged','abgcd','fgbc','afgcd','afgedc','abc','abcdefg','abcdfg'];
+  function pts(s) {
+    var w = 5.5;
+    if (s[4] === 'h') return [s[0],s[1], s[0]+w,s[1]-w, s[2]-w,s[1]-w, s[2],s[1], s[2]-w,s[1]+w, s[0]+w,s[1]+w].join(' ');
+    return [s[0],s[1], s[0]+w,s[1]+w, s[0]+w,s[3]-w, s[0],s[3], s[0]-w,s[3]-w, s[0]-w,s[1]+w].join(' ');
+  }
+  var NS = 'http://www.w3.org/2000/svg';
+  function makeDigit() {
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 60 100'); svg.setAttribute('class', 'digit'); svg.setAttribute('aria-hidden', 'true');
+    var g = document.createElementNS(NS, 'g'); g.setAttribute('transform', 'skewX(-6) translate(6 0)');
+    var segs = {};
+    'abcdefg'.split('').forEach(function (k) {
+      var p = document.createElementNS(NS, 'polygon'); p.setAttribute('points', pts(SEG[k])); g.appendChild(p); segs[k] = p;
+    });
+    svg.appendChild(g);
+    var cur = null;
+    return { el: svg, set: function (n) {
+      if (n === cur) return; cur = n;
+      var on = MAP[n];
+      for (var k in segs) segs[k].classList.toggle('lit', on.indexOf(k) !== -1);
+    } };
+  }
+
+  var digitsEl = document.getElementById('digits');
+  var groups = [3, 2, 2, 2];
+  var slots = [], colons = [];
+  groups.forEach(function (count, gi) {
+    if (gi > 0) {
+      var c = document.createElement('div'); c.className = 'colon'; c.setAttribute('aria-hidden', 'true');
+      c.innerHTML = '<i></i><i></i>'; digitsEl.appendChild(c); colons.push(c);
+    }
+    var grp = document.createElement('div'); grp.className = 'group';
+    var pair = document.createElement('div'); pair.className = 'pair';
+    var arr = [];
+    for (var i = 0; i < count; i++) { var d = makeDigit(); pair.appendChild(d.el); arr.push(d); }
+    var u = document.createElement('div'); u.className = 'unit'; u.textContent = L.units[gi];
+    grp.appendChild(pair); grp.appendChild(u); digitsEl.appendChild(grp);
+    slots.push(arr);
+  });
+
+  function show(arr, value) {
+    var s = String(value);
+    while (s.length < arr.length) s = '0' + s;
+    s = s.slice(-arr.length);
+    for (var i = 0; i < arr.length; i++) arr[i].set(+s[i]);
+  }
+
+  // Tijdstip van de dag in Bali -> achtergrond
+  var PERIODS = [
+    { id: 'night',     from: 0,    sky: 'linear-gradient(180deg,#070b1f 0%,#14204a 55%,#2a2f5c 100%)' },
+    { id: 'morning',   from: 5.5,  sky: 'linear-gradient(180deg,#7fb6e6 0%,#f7c99a 60%,#f39a6b 100%)' },
+    { id: 'midday',    from: 11,   sky: 'linear-gradient(180deg,#2f8fd8 0%,#7cc6ee 55%,#bfe6d0 100%)' },
+    { id: 'afternoon', from: 14.5, sky: 'linear-gradient(180deg,#4a9bd1 0%,#a9cfe0 50%,#f0d39a 100%)' },
+    { id: 'evening',   from: 17.5, sky: 'linear-gradient(180deg,#3b2a6b 0%,#c6527a 45%,#f79a45 100%)' },
+    { id: 'night',     from: 19.5, sky: 'linear-gradient(180deg,#070b1f 0%,#14204a 55%,#2a2f5c 100%)' }
+  ];
+  // Foto's per periode (Bali-tijd), van Unsplash (Unsplash License): 7 per tijdstip, één per dag van de week.
+  // pos = welk deel zichtbaar blijft op een smal scherm (standaard het midden)
+  var PHOTOS = window.BALI_PHOTOS || {
+    morning: [
+      { src: 'bali-ochtend.jpg', pos: '55% center', credit: 'Foto: Geio Tischler / Unsplash · Sidemen, Bali' },
+      { src: 'bali-ochtend-2.jpg', credit: 'Foto: resa cahya / Unsplash · Bali' },
+      { src: 'bali-ochtend-3.jpg', credit: 'Foto: Aron Visuals / Unsplash · Bali' },
+      { src: 'bali-ochtend-4.jpg', credit: 'Foto: Geio Tischler / Unsplash · Gunung Batur, Bali' },
+      { src: 'bali-ochtend-5.jpg', credit: 'Foto: Jayde Keroi / Unsplash · Gunung Batur, Bali' },
+      { src: 'bali-ochtend-6.jpg', credit: 'Foto: Didi Suprapta / Unsplash · Sanur, Bali' },
+      { src: 'bali-ochtend-7.jpg', credit: 'Foto: Silas Baisch / Unsplash · Tegallalang, Bali' }
+    ],
+    midday: [
+      { src: 'bali-middag.jpg', credit: 'Foto: Alexa West / Unsplash · Nusa Penida, Bali' },
+      { src: 'bali-middag-2.jpg', credit: 'Foto: Nattu Adnan / Unsplash · Kelingking Beach, Nusa Penida, Bali' },
+      { src: 'bali-middag-3.jpg', credit: 'Foto: Alfiano Sutianto / Unsplash · Nusa Penida, Bali' },
+      { src: 'bali-middag-4.jpg', credit: 'Foto: Jared Schwitzke / Unsplash · Uluwatu, Bali' },
+      { src: 'bali-middag-5.jpg', credit: 'Foto: Michael Tri Wijaya / Unsplash · Nusa Penida, Bali' },
+      { src: 'bali-middag-6.jpg', credit: 'Foto: Takashi Miyazaki / Unsplash · Diamond Beach, Nusa Penida, Bali' },
+      { src: 'bali-middag-7.jpg', credit: 'Foto: Alexandra Smielova / Unsplash · Uluwatu, Bali' }
+    ],
+    afternoon: [
+      { src: 'bali-namiddag.jpg', credit: 'Foto: Claudia Fernández Ortiz / Unsplash · Jatiluwih, Bali' },
+      { src: 'bali-namiddag-2.jpg', credit: 'Foto: Jeremy Bishop / Unsplash · Bali' },
+      { src: 'bali-namiddag-3.jpg', credit: 'Foto: Frans Daniels / Unsplash · Ubud, Bali' },
+      { src: 'bali-namiddag-4.jpg', credit: 'Foto: Aleksandra Dementeva / Unsplash · Sekumpul-waterval, Bali' },
+      { src: 'bali-namiddag-5.jpg', credit: 'Foto: Polina Kuzovkova / Unsplash · Uluwatu, Bali' },
+      { src: 'bali-namiddag-6.jpg', credit: 'Foto: Mahmud Ahsan / Unsplash · Bali' },
+      { src: 'bali-namiddag-7.jpg', credit: 'Foto: Radoslav Bali / Unsplash · Tegallalang, Bali' }
+    ],
+    evening: [
+      { src: 'bali-avond.jpg', pos: '62% center', credit: 'Foto: Harry Kessell / Unsplash · Tanah Lot, Bali' },
+      { src: 'bali-avond-2.jpg', credit: 'Foto: Aron Visuals / Unsplash · Bali' },
+      { src: 'bali-avond-3.jpg', credit: 'Foto: bckfwd / Unsplash · Tanah Lot, Bali' },
+      { src: 'bali-avond-4.jpg', credit: 'Foto: Mauro-Fabio Cilurzo / Unsplash · Uluwatu-tempel, Bali' },
+      { src: 'bali-avond-5.jpg', credit: 'Foto: Muhammad Novrijal / Unsplash · Bali' },
+      { src: 'bali-avond-6.jpg', credit: 'Foto: Katarzyna Zygnerska / Unsplash · Bali' },
+      { src: 'bali-avond-7.jpg', credit: 'Foto: Felipe Palacio / Unsplash · Seminyak, Bali' }
+    ],
+    night: [
+      { src: 'bali-nacht.jpg', credit: 'Foto: Aron Visuals / Unsplash · Bali' },
+      { src: 'bali-nacht-2.jpg', credit: 'Foto: Timo Wagner / Unsplash · Bali' },
+      { src: 'bali-nacht-3.jpg', credit: 'Foto: Atik sulianami / Unsplash · Bali' },
+      { src: 'bali-nacht-4.jpg', credit: 'Foto: Catherine Zaidova / Unsplash · Ubud, Bali' },
+      { src: 'bali-nacht-5.jpg', credit: 'Foto: Aron Visuals / Unsplash · Bali' },
+      { src: 'bali-nacht-6.jpg', credit: 'Foto: Arya Krisdyantara / Unsplash · Bali' },
+      { src: 'bali-nacht-7.jpg', credit: 'Foto: Lisa van Vliet / Unsplash · Amed, Bali' }
+    ]
+  };
+  // Foto van Kris: reserve wanneer een foto niet laadt
+  var HALFWAY_SOUND = 'halfweg.mp3';
+  var DEFAULT_PHOTO = { src: 'achtergrond.jpg', credit: '' };
+  var scene = document.getElementById('scene');
+  var photoEls = [document.getElementById('photoA'), document.getElementById('photoB')];
+  var front = 0;
+  function baliHour(now) {
+    var d = new Date(now + BALI_OFFSET_H * 3600000);
+    return d.getUTCHours() + d.getUTCMinutes() / 60;
+  }
+  function periodFor(now) {
+    var h = baliHour(now), p = PERIODS[0];
+    for (var i = 0; i < PERIODS.length; i++) if (h >= PERIODS[i].from) p = PERIODS[i];
+    return p;
+  }
+  // Elke week (maandag tot zondag, Bali-tijd) een nieuwe willekeurige volgorde, voor iedereen dezelfde.
+  // Een "Bali-dag" loopt van 5u30 tot 5u30, zodat een nacht na middernacht dezelfde foto houdt.
+  function seededOrder(n, seed) {
+    var a = [], i;
+    for (i = 0; i < n; i++) a.push(i);
+    var x = seed >>> 0;
+    function rnd() { x = (x + 0x6D2B79F5) >>> 0; var t = x; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }
+    for (i = n - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var tmp = a[i]; a[i] = a[j]; a[j] = tmp; }
+    return a;
+  }
+  function photoFor(periodId, now) {
+    var list = PHOTOS[periodId];
+    if (!list) return null;
+    if (!Array.isArray(list)) return list;
+    var day = Math.floor((now + (BALI_OFFSET_H - 5.5) * 3600000) / 86400000); // dagen sinds 1 jan 1970, Bali-dag
+    var week = Math.floor((day + 3) / 7);   // 1 jan 1970 was een donderdag; weken starten op maandag
+    var weekday = (day + 3) % 7;            // 0 = maandag ... 6 = zondag
+    var salt = { morning: 1, midday: 2, afternoon: 3, evening: 4, night: 5 }[periodId] || 0;
+    var order = seededOrder(list.length, week * 101 + salt);
+    return list[order[weekday % list.length]];
+  }
+  var currentKey = null;
+  function applyPeriod(now) {
+    var p = periodFor(now);
+    var photo = photoFor(p.id, now) || DEFAULT_PHOTO;
+    var key = p.id + '|' + photo.src;
+    if (key === currentKey) return;
+    currentKey = key;
+    scene.style.setProperty('--sky', p.sky);
+    scene.dataset.period = p.id;
+    var credit = document.getElementById('credit');
+    var next = photoEls[1 - front];
+    var img = new Image();
+    img.onerror = function () { if (photo !== DEFAULT_PHOTO) next.style.backgroundImage = 'url("' + DEFAULT_PHOTO.src + '")'; };
+    img.src = photo.src;
+    next.style.backgroundImage = 'url("' + photo.src + '")';
+    next.style.backgroundPosition = photo.pos || 'center';
+    next.classList.add('on'); photoEls[front].classList.remove('on');
+    front = 1 - front;
+    credit.textContent = photo.credit || '';
+  }
+
+  // In de getekende iPhone ('Aftelklok iPhone.html' opent deze pagina met #iphone): ruimte laten voor statusbalk en Dynamic Island
+  if (/iphone/.test(location.hash)) document.documentElement.style.setProperty('--safe-top', '59px');
+
+  // Klokjes: vaste tijdzones, 24-uursnotatie (uu:mm), ongeacht het toestel
+  var CLOCKS = [
+    { el: document.getElementById('timeKris'),  tz: 'Europe/Brussels' },  // Kris: België
+    { el: document.getElementById('timeNovku'), tz: 'Asia/Makassar' }     // Novku: Makassar (WITA, UTC+8)
+  ];
+  CLOCKS.forEach(function (c) {
+    try { c.fmt = new Intl.DateTimeFormat('en-GB', { timeZone: c.tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }); }
+    catch (e) { c.fmt = null; }
+  });
+  function two(n) { return (n < 10 ? '0' : '') + n; }
+  function clockText(c, now) {
+    if (!c.fmt) return '--:--';
+    var v = {};
+    c.fmt.formatToParts(new Date(now)).forEach(function (p) { v[p.type] = p.value; });
+    return two(+v.hour % 24) + ':' + v.minute;
+  }
+  function showClocks(now) {
+    CLOCKS.forEach(function (c) { var t = clockText(c, now); if (c.el.textContent !== t) c.el.textContent = t; });
+  }
+
+  // Halfweg (49,99 % tot 52 %): zodra dit venster begint, faadt de foto van Kris en Novku
+  // geleidelijk in over de achtergrond terwijl een fragment van "Livin' On A Prayer" speelt,
+  // en daarna blijft de foto het hele scherm vullen. Geen knop: de fade start vanzelf bij
+  // het openen. Geluid mag op iPhone pas na één aanraking van het scherm starten (regel van
+  // Safari); de fade loopt dan gewoon door en het geluid begint bij de eerste tik.
+  var HALFWAY_FROM = 49.99, HALFWAY_TO = 52;
+  var FADE_MS = 39000;                 // duur van de fade-in (±lengte van het fragment)
+  var halfPhoto = document.getElementById('halfPhoto');
+  var tapHint = document.getElementById('tapHint');
+  var halfAudio = null, halfStarted = false, fadeStart = 0, fadeRaf = 0;
+
+  // "Tik voor geluid" per taal; op iPhone start het geluid pas na één tik.
+  var TAPS = { nl: 'Tik voor geluid 🔊', en: 'Tap for sound 🔊', fr: 'Touchez pour le son 🔊', de: 'Für Ton tippen 🔊', es: 'Toca para activar el sonido 🔊', it: 'Tocca per l’audio 🔊', pt: 'Toque para ativar o som 🔊', id: 'Ketuk untuk suara 🔊' };
+  var tapText = TAPS[T[lang] ? lang : 'nl'] || TAPS.nl;
+  function showTapHint() { tapHint.textContent = tapText; tapHint.classList.add('show'); }
+  function hideTapHint() { tapHint.classList.remove('show'); }
+
+  function startHalfAudio() {
+    if (!halfAudio) { halfAudio = new Audio(HALFWAY_SOUND); halfAudio.preload = 'auto'; halfAudio.addEventListener('play', hideTapHint); }
+    var pr = halfAudio.play();
+    if (pr && pr.catch) pr.catch(function () {
+      // Autoplay geblokkeerd (o.a. iPhone Safari): start bij de eerste aanraking van het scherm.
+      var go = function () {
+        document.removeEventListener('pointerdown', go, true);
+        document.removeEventListener('touchstart', go, true);
+        var p2 = halfAudio.play(); if (p2 && p2.catch) p2.catch(function () {});
+      };
+      document.addEventListener('pointerdown', go, true);
+      document.addEventListener('touchstart', go, true);
+    });
+  }
+
+  function fadeTick() {
+    var t = Math.min(1, (Date.now() - fadeStart) / FADE_MS);
+    halfPhoto.style.opacity = Math.pow(t, 1.15);   // zachte start, zoals het nummer opbouwt
+    if (t < 1) fadeRaf = requestAnimationFrame(fadeTick);
+    else halfPhoto.style.opacity = 1;              // foto blijft het scherm vullen
+  }
+
+  function startHalfway() {
+    if (halfStarted) return;
+    halfStarted = true;
+    showTapHint();
+    fadeStart = Date.now();
+    fadeTick();
+    startHalfAudio();
+  }
+
+  function showHalfway(pct) {
+    var shown = Math.round(pct * 100) / 100;   // zoals het percentage op het scherm staat (2 cijfers na de komma)
+    if (!halfStarted && shown >= HALFWAY_FROM && shown <= HALFWAY_TO) startHalfway();
+  }
+
+  // Minder dan 100 dagen: bij elk openen telt een grote 100 per seconde af tot het echte
+  // aantal dagen (zoals op de klok). Daarna schuift het getal kleiner naar de plek van 🤭
+  // en blijft daar staan, omgeven door slingers en glitters. Het getal volgt de klok mee.
+  var BIG_FROM = 100;          // starten zodra de klok minder dan 100 dagen toont
+  var BIG_TEST_DAYS = 0;       // alleen in de testlink: tel altijd af tot dit (nagebootste) aantal dagen
+  var BIG_STEP_MS = 1000;      // per seconde 1 lager
+  var bigCount = document.getElementById('bigCount'), bigNum = document.getElementById('bigNum');
+  var bigDim = document.getElementById('bigDim'), bigSlot = document.getElementById('bigSlot');
+  var giggle = document.querySelector('.giggle');
+  var bigState = 0, bigShown = 100, bigTimer = 0;   // 0 = niet gestart, 1 = tellen, 2 = verschuiven, 3 = staat vast
+  var reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function bigTarget(days) {
+    if (BIG_TEST_DAYS > 0) return BIG_TEST_DAYS;
+    return days < BIG_FROM ? days : -1;
+  }
+
+  // Slingers (vlaggetjes aan een koord), twee krullende linten en glitters
+  function buildDeco() {
+    var COLORS = ['#ff4d6d', '#ffd77a', '#4cc9f0', '#ffb547', '#b5179e', '#80ed99', '#ff6a3d'];
+    var g = document.createElementNS(NS, 'svg');
+    g.setAttribute('viewBox', '0 0 270 50'); g.setAttribute('class', 'deco garland');
+    var x0 = 5, y0 = 6, cx = 135, cy = 34, x1 = 265, y1 = 6, html = '';
+    html += '<path d="M' + x0 + ' ' + y0 + ' Q' + cx + ' ' + cy + ' ' + x1 + ' ' + y1 + '" fill="none" stroke="#fff6d8" stroke-width="1.6" opacity=".9"/>';
+    var n = 11;
+    for (var i = 0; i < n; i++) {
+      var t = (i + .5) / n, u = 1 - t;
+      var x = u * u * x0 + 2 * u * t * cx + t * t * x1, y = u * u * y0 + 2 * u * t * cy + t * t * y1;
+      html += '<polygon points="' + (x - 9) + ',' + (y - 1) + ' ' + (x + 9) + ',' + (y - 1) + ' ' + x + ',' + (y + 17) + '" fill="' + COLORS[i % COLORS.length] + '" stroke="rgba(0,0,0,.25)" stroke-width=".6"/>';
+    }
+    g.innerHTML = html;
+    bigCount.appendChild(g);
+    ['l', 'r'].forEach(function (side, k) {
+      var st = document.createElementNS(NS, 'svg');
+      st.setAttribute('viewBox', '0 0 40 120'); st.setAttribute('class', 'deco streamer ' + side);
+      st.innerHTML =
+        '<path d="M30 2 C 4 14, 36 30, 14 44 S 34 72, 10 86 S 30 108, 18 118" fill="none" stroke="' + COLORS[k ? 2 : 0] + '" stroke-width="5" stroke-linecap="round"/>' +
+        '<path d="M22 6 C 0 22, 30 40, 8 56 S 28 84, 6 100" fill="none" stroke="' + COLORS[k ? 1 : 5] + '" stroke-width="3.5" stroke-linecap="round" opacity=".9"/>';
+      bigCount.appendChild(st);
+    });
+    var gl = document.createElement('div'); gl.className = 'deco glitter';
+    var SPARK = ['#fff6d8', '#ffd77a', '#ffffff', '#ff8fab', '#ffb547'];
+    for (var j = 0; j < 22; j++) {
+      var a = j / 22 * Math.PI * 2 + (j % 3) * .35, r = 1.05 + (j * 37 % 10) / 22;
+      var sp = document.createElement('i'); sp.className = 'spark';
+      sp.style.left = (50 + Math.cos(a) * r * 62) + '%';
+      sp.style.top = (50 + Math.sin(a) * r * 58) + '%';
+      sp.style.setProperty('--s', (.1 + (j * 13 % 7) / 50) + 'em');
+      sp.style.setProperty('--c', SPARK[j % SPARK.length]);
+      sp.style.setProperty('--d', (1.4 + (j * 7 % 9) / 6) + 's');
+      sp.style.setProperty('--delay', (-(j * 0.37) % 2) + 's');
+      gl.appendChild(sp);
+    }
+    bigCount.appendChild(gl);
+  }
+
+  // Vanaf 50 dagen: elke dag een beetje roder (goud bij 50, fel LED-rood op de laatste dag)
+  // en sneller pulseren (1 keer per 2 s bij 50 dagen, ±3 keer per seconde op de laatste dag).
+  var HOT_FROM = 50, PULSE_SLOW = 2, PULSE_FAST = 1 / 3;
+  var GOLD = [[255,246,216],[255,215,122],[255,181,71],[255,106,61]], RED = [[255,179,168],[255,90,74],[255,59,47],[179,20,12]];
+  function mix(a, b, k) { return 'rgb(' + a.map(function (v, i) { return Math.round(v + (b[i] - v) * k); }).join(',') + ')'; }
+  function applyHeat(n) {
+    var hot = n <= HOT_FROM, k = hot ? Math.min(1, (HOT_FROM - Math.max(0, n)) / HOT_FROM) : 0;
+    for (var i = 0; i < 4; i++) bigNum.style.setProperty('--n' + (i + 1), mix(GOLD[i], RED[i], k));
+    bigNum.style.setProperty('--glow', 'rgba(' + Math.round(255) + ',' + Math.round(181 - 122 * k) + ',' + Math.round(71 - 24 * k) + ',' + (.55 + .25 * k).toFixed(2) + ')');
+    bigNum.style.setProperty('--pulse', (PULSE_SLOW * Math.pow(PULSE_FAST / PULSE_SLOW, k)).toFixed(3) + 's');
+    bigNum.classList.toggle('hot', hot);
+  }
+  function setBigNum(n) {
+    if (bigShown === n) return;
+    bigShown = n; bigNum.textContent = String(n); applyHeat(n);
+    if (bigState === 1 && !reduceMotion) { bigNum.classList.remove('pop'); void bigNum.offsetWidth; bigNum.classList.add('pop'); }
+  }
+  function bigCountSize() { return Math.min(innerWidth * 0.5, innerHeight * 0.36); }
+  function slotSize() { return Math.max(48, Math.min(innerHeight * 0.085, innerWidth * 0.2, 92)); }
+
+  // Eindplaats: het getal staat onderaan in #bigSlot, de slinger hangt erboven
+  function placeFinal() {
+    var r = bigSlot.getBoundingClientRect(), fs = slotSize();
+    bigCount.style.setProperty('--big-fs', fs + 'px');
+    bigCount.style.left = (r.left + r.width / 2) + 'px';
+    bigCount.style.top = (r.bottom - fs / 2) + 'px';
+  }
+  function startBig(target) {
+    bigState = 1;
+    buildDeco();
+    bigShown = 100; bigNum.textContent = '100'; applyHeat(100);
+    bigCount.style.setProperty('--big-fs', bigCountSize() + 'px');
+    bigCount.classList.add('show');
+    bigDim.classList.add('on');
+    bigTimer = setInterval(function () {
+      var t = bigTarget(currentDays);
+      if (bigShown > t) setBigNum(bigShown - 1);
+      if (bigShown <= t) { clearInterval(bigTimer); setTimeout(moveBig, 900); }
+    }, BIG_STEP_MS);
+  }
+  function moveBig() {
+    bigState = 2;
+    document.documentElement.style.setProperty('--big-slot-h', (slotSize() * 1.55) + 'px');
+    giggle.style.display = 'none';
+    bigSlot.hidden = false;
+    if (!reduceMotion) bigCount.classList.add('moving');
+    placeFinal();
+    bigDim.classList.remove('on');
+    setTimeout(function () {
+      bigCount.classList.remove('moving');
+      bigCount.classList.add('final');
+      bigState = 3;
+      startFlashes();
+    }, reduceMotion ? 0 : 1350);
+  }
+  // Flikkerfoto's: zodra het getal vast staat, flikkert op een willekeurig moment (10 tot 45 s)
+  // één van deze foto's over het hele scherm in als een haperende TL-lamp, blijft ±1,5 s
+  // staan en faadt dan uit. Willekeurige volgorde, nooit twee keer na elkaar dezelfde.
+  // Nieuwe foto's: bestand in de map zetten en de naam hier toevoegen.
+  var FLASH_PHOTOS = ['halfweg-foto.png', 'flikker-1.jpg', 'flikker-2.jpg', 'flikker-3.jpg', 'flikker-4.jpg', 'flikker-5.jpg', 'flikker-6.jpg'];
+  var FLASH_MIN_MS = 10000, FLASH_MAX_MS = 45000;   // wachttijd tussen twee flitsen
+  var FLASH_HOLD_MS = 1500;                         // goed zichtbaar na het flikkeren
+  var FLASH_OUT_MS = 1000;                          // duur van het uitfaden
+  // Flikkerpatroon [helderheid, ms]: aan-uit-aan zoals een TL-lamp die aanslaat
+  var FLICKER = [[1,60],[0,90],[.9,40],[0,220],[.7,50],[0,80],[1,70],[.25,60],[1,110],[.5,45],[1,0]];
+  var flashEl = document.getElementById('flash');
+  var flashReady = [], flashLast = -1, flashStarted = false;
+  flashEl.style.setProperty('--flash-out', (FLASH_OUT_MS / 1000) + 's');
+  FLASH_PHOTOS.forEach(function (src) {          // vooraf laden; alleen geladen foto's flitsen
+    var im = new Image();
+    im.onload = function () { flashReady.push(src); };
+    im.src = src;
+  });
+  function nextFlash() {
+    setTimeout(doFlash, FLASH_MIN_MS + Math.random() * (FLASH_MAX_MS - FLASH_MIN_MS));
+  }
+  function doFlash() {
+    if (document.hidden || !flashReady.length || cheerOn) { nextFlash(); return; }
+    var i = Math.floor(Math.random() * flashReady.length);
+    if (flashReady.length > 1 && flashReady[i] === flashLast) i = (i + 1 + Math.floor(Math.random() * (flashReady.length - 1))) % flashReady.length;
+    flashLast = flashReady[i];
+    flashEl.classList.remove('out');
+    flashEl.style.backgroundImage = 'url("' + flashLast + '")';
+    var steps = reduceMotion ? [[1,0]] : FLICKER, k = 0;
+    (function step() {
+      flashEl.style.opacity = steps[k][0];
+      if (k < steps.length - 1) { setTimeout(step, steps[k++][1]); return; }
+      setTimeout(function () {
+        flashEl.classList.add('out');
+        flashEl.style.opacity = 0;
+        setTimeout(function () { flashEl.classList.remove('out'); nextFlash(); }, FLASH_OUT_MS + 50);
+      }, FLASH_HOLD_MS);
+    })();
+  }
+  function startFlashes() {
+    if (flashStarted) return;
+    flashStarted = true;
+    nextFlash();
+  }
+
+  // Aanmoedigingen voor Nov (sinds v26): op 8 december 2026 moet Nov om 10:30 Makassar-tijd
+  // naar de visumcommissie. Van 06:00 tot 12:00 Makassar-tijd (WITA, UTC+8) = 7 dec 23:00 tot
+  // 8 dec 05:00 Belgische tijd licht op de plek van 🤭 telkens één banner op (flikkerend als een
+  // TL-lamp), blijft CHEER_SHOW_MS staan, faadt uit en de volgende komt.
+  // Van 10:15 tot 11:00 blijft één extra grote banner staan, en lichten de gewone teksten
+  // er kort rond op (klein, boven en onder de grote banner, om beurten).
+  // Het grote aftellen en de flikkerfoto's pauzeren in die periode; daarna wordt alles weer
+  // zoals voordien. De teksten zijn altijd Engels/Indonesisch (goedgekeurd door Kris, 19 nov 2026).
+  var CHEER_FROM = Date.UTC(2026, 11, 7, 22, 0, 0);      // 8 dec 2026 06:00 in Makassar
+  var CHEER_TO   = Date.UTC(2026, 11, 8, 4, 0, 0);       // 8 dec 2026 12:00 in Makassar
+  var CHEER_NOW_FROM = Date.UTC(2026, 11, 8, 2, 15, 0);  // 8 dec 2026 10:15 in Makassar
+  var CHEER_NOW_TO   = Date.UTC(2026, 11, 8, 3, 0, 0);   // 8 dec 2026 11:00 in Makassar
+  var CHEER_TEST = false;      // alleen in de testlink: altijd aan; 50 s gewone banners, dan 25 s de grote
+  var CHEER_SHOW_MS = 6000;    // hoe lang één gewone banner blijft staan
+  var CHEER_OUT_MS = 800;      // duur van het uitfaden
+  var SIDE_SHOW_MS = 2200;     // kleine banners rond de grote: zo lang zichtbaar
+  var SIDE_GAP_MS = 900;       // en zo lang niets tussen twee kleine banners
+  var CHEERS = [
+    'Good Luck!',
+    '👍🏻👍🏻👍🏻',
+    'You can do this Nov!',
+    'Semoga berhasil, Nov!',
+    'Kamu pasti bisa!',
+    'Semangat, Nov! 💪',
+    'Aku percaya padamu ❤',
+    'Tetap tenang,\nkamu hebat!'
+  ];
+  var CHEER_NOW = 'Good luck NOW! 👍🏻\nSekarang saatnya!';
+  var cheerMsg = document.getElementById('cheerMsg'), cheerSide = document.getElementById('cheerSide');
+  var cheerOn = false, cheerIdx = 0, cheerTimer = 0, cheerIsNow = false, cheerSwitching = false;
+  var sideOn = false, sideTimer = 0, sideIdx = 0, sideSpot = 0;
+  var cheerLoaded = Date.now();
+  cheerMsg.style.setProperty('--cheer-out', (CHEER_OUT_MS / 1000) + 's');
+  cheerSide.style.setProperty('--cheer-out', (CHEER_OUT_MS / 1000) + 's');
+  function cheerMode(now) {               // 0 = niets, 1 = wisselende banners, 2 = grote banner (10:15 tot 11:00)
+    if (CHEER_TEST) return ((now - cheerLoaded) % 75000) < 50000 ? 1 : 2;
+    if (now < CHEER_FROM || now >= CHEER_TO) return 0;
+    return (now >= CHEER_NOW_FROM && now < CHEER_NOW_TO) ? 2 : 1;
+  }
+  // Laat een banner oplichten zoals een TL-lamp die aanslaat; daarna 'done'
+  function lightUp(el, setTimer, done) {
+    var steps = reduceMotion ? [[1,0]] : FLICKER, k = 0;
+    el.classList.remove('out');
+    (function step() {
+      el.style.opacity = steps[k][0];
+      if (k < steps.length - 1) { setTimer(step, steps[k++][1]); return; }
+      done();
+    })();
+  }
+  function cheerLater(fn, ms) { clearTimeout(cheerTimer); cheerTimer = setTimeout(fn, ms); }
+  function sideLater(fn, ms) { clearTimeout(sideTimer); sideTimer = setTimeout(fn, ms); }
+  function cheerNext() {
+    cheerSwitching = false;
+    var m = cheerMode(Date.now());
+    if (!m) { stopCheer(); return; }
+    cheerIsNow = (m === 2);
+    cheerMsg.classList.toggle('now', cheerIsNow);
+    if (cheerIsNow) cheerMsg.textContent = CHEER_NOW;
+    else { cheerMsg.textContent = CHEERS[cheerIdx % CHEERS.length]; cheerIdx++; }
+    lightUp(cheerMsg, cheerLater, function () {
+      if (cheerIsNow) startSide();
+      cheerLater(cheerHold, cheerIsNow ? 1000 : CHEER_SHOW_MS);
+    });
+  }
+  function cheerHold() {
+    // De grote banner blijft staan zolang het 10:15 tot 11:00 is
+    if (cheerIsNow && cheerMode(Date.now()) === 2) { cheerLater(cheerHold, 1000); return; }
+    stopSide();
+    cheerSwitching = true;
+    cheerMsg.classList.add('out');
+    cheerMsg.style.opacity = 0;
+    cheerLater(cheerNext, CHEER_OUT_MS + 300);
+  }
+  // Kleine banners rond de grote: om beurten boven-links, onder-rechts, boven-rechts, onder-links
+  var SIDE_SPOTS = [['top', 'left'], ['bottom', 'right'], ['top', 'right'], ['bottom', 'left']];
+  function startSide() { if (sideOn) return; sideOn = true; sideNext(); }
+  function stopSide() {
+    sideOn = false; clearTimeout(sideTimer);
+    cheerSide.classList.remove('show'); cheerSide.style.opacity = 0;
+  }
+  function sideNext() {
+    if (!sideOn) return;
+    var spot = SIDE_SPOTS[sideSpot++ % SIDE_SPOTS.length];
+    cheerSide.textContent = CHEERS[sideIdx++ % CHEERS.length];
+    cheerSide.style.opacity = 0;
+    cheerSide.classList.add('show');
+    var r = cheerMsg.getBoundingClientRect(), sw = cheerSide.offsetWidth, sh = cheerSide.offsetHeight;
+    var pad = 10, x = spot[1] === 'left' ? r.left - sw * .25 : r.right - sw * .75;
+    x = Math.max(pad, Math.min(innerWidth - sw - pad, x));
+    var y = spot[0] === 'top' ? r.top - sh * .8 : r.bottom - sh * .2;
+    cheerSide.style.left = x + 'px'; cheerSide.style.top = y + 'px';
+    cheerSide.style.setProperty('--tilt', (spot[1] === 'left' ? -4 : 4) + 'deg');
+    lightUp(cheerSide, sideLater, function () {
+      sideLater(function () {
+        cheerSide.classList.add('out'); cheerSide.style.opacity = 0;
+        sideLater(sideNext, CHEER_OUT_MS + SIDE_GAP_MS);
+      }, SIDE_SHOW_MS);
+    });
+  }
+  function startCheer() {
+    cheerOn = true;
+    document.documentElement.classList.add('cheering');
+    cheerNext();
+  }
+  function stopCheer() {
+    clearTimeout(cheerTimer); stopSide();
+    cheerOn = false; cheerIsNow = false; cheerSwitching = false;
+    cheerMsg.style.opacity = 0;
+    document.documentElement.classList.remove('cheering');
+  }
+  function showCheer(now) {
+    var m = cheerMode(now);
+    if (m && !cheerOn) startCheer();
+    else if (!m && cheerOn) stopCheer();
+    else if (m === 2 && !cheerIsNow && !cheerSwitching) cheerHold();   // 10:15: meteen naar de grote banner
+  }
+
+  var currentDays = 999;
+  function showBig(days, left) {
+    currentDays = days;
+    if (cheerOn) return;           // aanmoedigingen: groot aftellen pauzeert
+    if (bigState === 0) {
+      var t = bigTarget(days);
+      if (left > 0 && t >= 0) startBig(t);
+    } else if (bigState === 3) {
+      setBigNum(Math.max(0, bigTarget(days)));
+      placeFinal();
+    }
+  }
+  window.addEventListener('resize', function () {
+    if (bigState === 1) bigCount.style.setProperty('--big-fs', bigCountSize() + 'px');
+    if (bigState >= 2) { document.documentElement.style.setProperty('--big-slot-h', (slotSize() * 1.55) + 'px'); placeFinal(); }
+  });
+
+  var bar = document.getElementById('bar'), fill = document.getElementById('fill'), plane = document.getElementById('plane'), pctEl = document.getElementById('pct');
+  var titleDone = false;
+  function tick() {
+    var now = Date.now();
+    var left = Math.max(0, ARRIVAL - now);
+    var sec = Math.floor(left / 1000);
+    show(slots[0], Math.floor(sec / 86400));
+    show(slots[1], Math.floor(sec % 86400 / 3600));
+    show(slots[2], Math.floor(sec % 3600 / 60));
+    show(slots[3], sec % 60);
+    var blink = left > 0 && (now % 1000) >= 500;
+    colons.forEach(function (c) { c.classList.toggle('blink', blink); });
+
+    var pct = Math.min(100, Math.max(0, (now - START) / (ARRIVAL - START) * 100));
+    fill.style.width = pct + '%';
+    plane.style.left = Math.max(3, pct) + '%';
+    bar.setAttribute('aria-valuenow', pct.toFixed(2));
+    pctEl.textContent = pctFmt.format(pct) + ' %';
+
+    if (left === 0 && !titleDone) { setTitle(L.done); titleDone = true; }
+    showHalfway(pct);
+    showCheer(now);
+    showBig(Math.floor(sec / 86400), left);
+    applyPeriod(now);
+    showClocks(now);
+  }
+  tick();
+  setInterval(tick, 250);
+})();
+</script>
+
+</body></html>
