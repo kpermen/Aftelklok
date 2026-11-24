@@ -1,8 +1,18 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><!-- Privacy-friendly analytics by Plausible -->
-<script async src="https://plausible.io/js/pa-TQbdfmMVt8X8uMIAspKlQ.js"></script>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><!-- Privacy-friendly analytics by Plausible (met opt-out voor eigen bezoeken) -->
 <script>
-  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
-  plausible.init()
+(function () {
+  try {
+    var p = new URLSearchParams(location.search);
+    if (p.has('mij-niet-meetellen')) { localStorage.setItem('plausible_ignore', 'true'); alert('OK \u2014 jouw bezoeken worden op dit toestel niet meer meegeteld.'); }
+    if (p.has('mij-wel-meetellen')) { localStorage.removeItem('plausible_ignore'); alert('OK \u2014 jouw bezoeken worden op dit toestel weer meegeteld.'); }
+  } catch (e) {}
+  try { if (localStorage.getItem('plausible_ignore') === 'true') return; } catch (e) {}
+  window.plausible = window.plausible || function () { (plausible.q = plausible.q || []).push(arguments) };
+  plausible.init = plausible.init || function (i) { plausible.o = i || {} };
+  var s = document.createElement('script'); s.async = true; s.src = 'https://plausible.io/js/pa-TQbdfmMVt8X8uMIAspKlQ.js';
+  document.head.appendChild(s);
+  plausible.init();
+})();
 </script>
 </head><body>
 <title>Aftelklok naar Bali</title>
